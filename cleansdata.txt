@@ -1,0 +1,23 @@
+library(rggobi)
+library(norm)
+
+x=read.csv("C:\\Users\\ASUS\\Desktop\\pbc.csv")
+ggobi(x)
+d <- as.matrix(subset(x,select= chol:protime))
+d <- prelim.norm(d)
+d.nm <- prelim.norm(d)
+d.nm$nmis
+d.nm$r
+gd <- ggobi(x)[1]
+gcolor <- ifelse(gd[,1]=='f',3,9)
+glyph_color(gd) <- gcolor
+ismis <- apply(gd[,12:19], 1, function(x) any(is.na(x)))
+gcolor[ismis] <- gcolor[ismis]+1
+glyph_color(gd) <- gcolor
+
+rngseed(11112367)
+theta <- em.norm(d.nm, showits=TRUE)
+
+d.impute <- imp.norm(d.nm, theta, d)
+
+write.table(d.impute ,file='CleansData.csv', row.names=F ,sep=',')
